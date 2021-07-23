@@ -1,6 +1,7 @@
 """
-途中でgolangでやりたくなったので放棄
-[python-docxを使ってdocxファイルを書き換える](https://qiita.com/butada/items/93ad2301348a4fe28b5c)
+docxファイルの文字列置換を行うモジュール
+usage:
+    $ python xreplace.py oldfile.docx newfile.docx replaceword.csv
 """
 import sys
 import csv
@@ -40,23 +41,9 @@ def replace_texts(readfile, writefile, *words):
 
 if __name__ == '__main__':
     if len(sys.argv) < 4:
-        """old code"""
-        # HARD CORDED HERE
-        READFILE = '/4_Restriction/SS用無線通信総合説明書/j情報セキュリティ（19SS以降）/27SS/帳票類/' +\
-            '25　25SS可搬記憶媒体持ち込み申請書2.docx'
-        # replace file name
-        WRITEFILE = READFILE.replace('25SS', '27SS')
-        # replace word list
-        REPLACER = (
-            # (BEFORE, AFTER)
-            ('25SS', '27SS'),
-            ('23SS', '25SS'),
-        )
-        replace_texts(READFILE, WRITEFILE, *REPLACER)
-        sys.exit(1)
-    # Command line here
-    readfile, writefile = sys.argv[1], sys.argv[2]
+        raise ValueError('引数が足りません' + __doc__)
+    oldfile, newfile = sys.argv[1], sys.argv[2]
     with open(sys.argv[3], newline='', encoding='sjis') as csvfile:
         reader = csv.reader(csvfile, delimiter=(','), quotechar='|')
         replacer = [row[0].split('\t') for row in reader]
-    replace_texts(readfile, writefile, *replacer)
+    replace_texts(oldfile, newfile, *replacer)
