@@ -1,11 +1,9 @@
 """
 docxファイルの文字列置換を行うモジュール
 usage:
-    $ python xreplace.py oldword newword filename
-    $ python xreplace.py -f oldfile.docx -o newfile.docx -w replaceword.csv
+    $ python renamex.py OLDWORD NEWWORD [FILENAMES...]
 """
 import sys
-import csv
 from docx import Document
 # from docx.shared import Pt
 from docx.shared import RGBColor
