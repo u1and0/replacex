@@ -1,7 +1,7 @@
 """
 docxファイルの文字列置換を行うモジュール
 usage:
-    $ python renamex.py OLDWORD NEWWORD [FILENAMES...]
+    $ python replacex.py OLDWORD NEWWORD [FILENAMES...]
 """
 import sys
 from docx import Document
