@@ -1,10 +1,11 @@
-"""
-docxファイルの文字列置換を行うモジュール
+#!/usr/bin/env python3
+""" docxファイルの文字列置換を行うモジュール
 usage:
     $ python replacex.py OLDWORD NEWWORD [FILENAMES...]
 """
 import sys
 from docx import Document
+# from docx.shared import Pt
 from docx.shared import RGBColor
 
 
@@ -13,6 +14,7 @@ def replace_text(paragraph, before, after):
     replaced_text = paragraph.text.replace(before, after)
     if paragraph.text != replaced_text:
         paragraph.text = replaced_text
+        # paragraph.runs[0].font.size = Pt(10.5)
         paragraph.runs[0].font.color.rgb = RGBColor(235, 0, 0)
 
 
@@ -53,4 +55,7 @@ def main(old, new, *filenames):
 
 
 if __name__ == '__main__':
+    if '-h' in sys.argv or '--help' in sys.argv:
+        print(__doc__)
+        sys.exit(0)
     main(sys.argv[1], sys.argv[2], *sys.argv[3:])
