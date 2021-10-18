@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 """Replace text and highlight it in docx files.
-
-usage:
-    $ python replacex.py OLDWORD NEWWORD [FILENAMES...]
 """
 import sys
 import argparse
