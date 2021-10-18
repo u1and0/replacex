@@ -4,6 +4,7 @@
 import sys
 import argparse
 from itertools import chain
+from more_itertools import collapse
 from docx import Document
 # from docx.shared import Pt
 from docx.shared import RGBColor
@@ -45,12 +46,14 @@ def main(old, new, *filenames, dryrun, verbose):
         if verbose or dryrun:
             print("==filename:", filename, "==")
         paragraphs = replace_document(old, new, document)
-        for paragraph in paragraphs:
-            for text in paragraph:
-                # Print out result to stdout if verbose mode or dryrun mode
-                if verbose or dryrun:
-                    colored = text.replace(new, CRED + new + CEND)
-                    print(colored)
+        # Break nested iters by collapse()
+        # replace_document() , replace_text() are generator
+        # execute to edit docx through this 'for' statement
+        for paragraph_text in collapse(paragraphs):  # Replace text HERE
+            # Print out result to stdout if verbose mode or dryrun mode
+            if verbose or dryrun:
+                colored = paragraph_text.replace(new, CRED + new + CEND)
+                print(colored)
         # Save Document unless dryrun mode
         if not dryrun:
             document.save(filename)
