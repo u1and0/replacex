@@ -3,16 +3,14 @@
 
 usage:
     $ python replacex.py OLDWORD NEWWORD [FILENAMES...]
-
-option:
-    -n, --dryrun: DO NOT save docx file just print replacement result.
 """
 import sys
+import argparse
 from docx import Document
 # from docx.shared import Pt
 from docx.shared import RGBColor
 
-VERSION = 'v0.1.0'
+VERSION = 'v0.2.0'
 CRED = '\033[91m'
 CEND = '\033[0m'
 
@@ -48,23 +46,26 @@ def main(old, new, *filenames, dryrun=False):
             document.save(filename)
 
 
+def parse():
+    """引数解析"""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('old', type=str, help='old word')
+    parser.add_argument('new', type=str, help='new word')
+    parser.add_argument('files', type=str, nargs='*', help='docx file path')
+    parser.add_argument(
+        '-n',
+        '--dryrun',
+        help='DO NOT save docx file just print replacement result.',
+        action='store_true',
+        default=False,
+    )
+    parser.add_argument('-V', '--version', action='store_true')
+    return parser.parse_args()
+
+
 if __name__ == '__main__':
-    argv = sys.argv
-    if '-V' in argv or '--version' in argv:
+    argv = parse()
+    if argv.version:
         print('replacex:', VERSION)
         sys.exit(0)
-    if '-h' in argv or '--help' in argv:
-        print(__doc__)
-        sys.exit(0)
-    dryrun = False
-    if '-n' in argv or '--dryrun' in argv:
-        dryrun = True
-        try:
-            argv.remove('-n')
-        except ValueError:
-            pass
-        try:
-            argv.remove('--dryrun')
-        except ValueError:
-            pass
-    main(argv[1], argv[2], *argv[3:], dryrun=dryrun)
+    main(argv.old, argv.new, *argv.files, dryrun=argv.dryrun)
