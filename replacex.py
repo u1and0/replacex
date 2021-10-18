@@ -8,12 +8,19 @@ from docx import Document
 # from docx.shared import Pt
 from docx.shared import RGBColor
 
+CRED = '\033[91m'
+CEND = '\033[0m'
+
 
 def replace_text(paragraph, before, after):
     """paragraph内の文字列beforeをafterへ置換する"""
     replaced_text = paragraph.text.replace(before, after)
     if paragraph.text != replaced_text:
         paragraph.text = replaced_text
+        # Print out result
+        colored = paragraph.text.replace(after, CRED + after + CEND)
+        print(colored)
+        # Modify docx sentence
         # paragraph.runs[0].font.size = Pt(10.5)
         paragraph.runs[0].font.color.rgb = RGBColor(235, 0, 0)
 
@@ -42,6 +49,7 @@ def main(old, new, *filenames):
     """引数に対してreplace_textを実行する"""
     for filename in filenames:
         document = Document(filename)
+        print("==filename:", filename, "==")
         # 本文書き換え
         for paragraph in document.paragraphs:
             replace_text(paragraph, old, new)
