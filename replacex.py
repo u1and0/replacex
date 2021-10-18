@@ -10,7 +10,7 @@ from docx import Document
 # from docx.shared import Pt
 from docx.shared import RGBColor
 
-VERSION = 'v0.2.0'
+VERSION = 'v1.0.0'
 CRED = '\033[91m'
 CEND = '\033[0m'
 
@@ -20,23 +20,27 @@ def replace_text(paragraph, before, after):
     replaced_text = paragraph.text.replace(before, after)
     if paragraph.text != replaced_text:
         paragraph.text = replaced_text
-        # Print out result
-        colored = paragraph.text.replace(after, CRED + after + CEND)
-        print(colored)
         # Modify docx sentence
         # paragraph.runs[0].font.size = Pt(10.5)
         paragraph.runs[0].font.color.rgb = RGBColor(235, 0, 0)
+        yield paragraph.text
 
 
-def main(old, new, *filenames, dryrun=False):
-    """引数に対してreplace_textを実行する"""
+def main(old, new, *filenames, dryrun=False, verbose=False):
+    """execute replace_text to multiple files"""
     for filename in filenames:
         document = Document(filename)
-        print("==filename:", filename, "==")
-        # 本文書き換え
+        if verbose or dryrun:
+            print("==filename:", filename, "==")
+        # Rewrite sentence
         for paragraph in document.paragraphs:
-            replace_text(paragraph, old, new)
-        # テーブル書き換え
+            text_it = replace_text(paragraph, old, new)
+            if verbose or dryrun:  # Print out result
+                for text in text_it:
+                    colored = text.replace(new, CRED + new + CEND)
+                    print(colored)
+
+        # Rewrite table
         paragraphs = (paragraph for table in document.tables
                       for row in table.rows for cell in row.cells
                       for paragraph in cell.paragraphs)
@@ -47,7 +51,7 @@ def main(old, new, *filenames, dryrun=False):
 
 
 def parse():
-    """引数解析"""
+    """arg parser"""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('old', type=str, help='old word')
     parser.add_argument('new', type=str, help='new word')
@@ -56,6 +60,13 @@ def parse():
         '-n',
         '--dryrun',
         help='DO NOT save docx file just print replacement result.',
+        action='store_true',
+        default=False,
+    )
+    parser.add_argument(
+        '-v',
+        '--verbose',
+        help='print replacement result to stdout',
         action='store_true',
         default=False,
     )
@@ -68,4 +79,8 @@ if __name__ == '__main__':
     if argv.version:
         print('replacex:', VERSION)
         sys.exit(0)
-    main(argv.old, argv.new, *argv.files, dryrun=argv.dryrun)
+    main(argv.old,
+         argv.new,
+         *argv.files,
+         dryrun=argv.dryrun,
+         verbose=argv.verbose)
