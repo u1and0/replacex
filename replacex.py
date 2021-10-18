@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
-""" docxファイルの文字列置換を行うモジュール
+"""Replace text and highlight it in docx files.
+
 usage:
     $ python replacex.py OLDWORD NEWWORD [FILENAMES...]
+
+option:
+    -n, --dryrun: DO NOT save docx file just print replacement result.
 """
 import sys
 from docx import Document
 # from docx.shared import Pt
 from docx.shared import RGBColor
 
+VERSION = 'v0.1.0'
 CRED = '\033[91m'
 CEND = '\033[0m'
 
@@ -25,27 +30,7 @@ def replace_text(paragraph, before, after):
         paragraph.runs[0].font.color.rgb = RGBColor(235, 0, 0)
 
 
-def replace_texts(readfile, writefile, *words):
-    """
-    readfile内の本文とテーブルの文字列を
-    wordsに従って置換して
-    writefileへ保存する。
-    """
-    document = Document(readfile)
-    for word in words:
-        # 本文書き換え
-        for paragraph in document.paragraphs:
-            replace_text(paragraph, word[0], word[1])
-        # テーブル書き換え
-        paragraphs = (paragraph for table in document.tables
-                      for row in table.rows for cell in row.cells
-                      for paragraph in cell.paragraphs)
-        for paragraph in paragraphs:
-            replace_text(paragraph, word[0], word[1])
-    document.save(writefile)
-
-
-def main(old, new, *filenames):
+def main(old, new, *filenames, dryrun=False):
     """引数に対してreplace_textを実行する"""
     for filename in filenames:
         document = Document(filename)
@@ -59,11 +44,27 @@ def main(old, new, *filenames):
                       for paragraph in cell.paragraphs)
         for paragraph in paragraphs:
             replace_text(paragraph, old, new)
-        document.save(filename)
+        if not dryrun:
+            document.save(filename)
 
 
 if __name__ == '__main__':
-    if '-h' in sys.argv or '--help' in sys.argv:
+    argv = sys.argv
+    if '-V' in argv or '--version' in argv:
+        print('replacex:', VERSION)
+        sys.exit(0)
+    if '-h' in argv or '--help' in argv:
         print(__doc__)
         sys.exit(0)
-    main(sys.argv[1], sys.argv[2], *sys.argv[3:])
+    dryrun = False
+    if '-n' in argv or '--dryrun' in argv:
+        dryrun = True
+        try:
+            argv.remove('-n')
+        except ValueError:
+            pass
+        try:
+            argv.remove('--dryrun')
+        except ValueError:
+            pass
+    main(argv[1], argv[2], *argv[3:], dryrun=dryrun)
