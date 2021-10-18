@@ -32,8 +32,8 @@ def main(old, new, *filenames, dryrun=False, verbose=False):
         # Rewrite sentence
         for paragraph in document.paragraphs:
             text_it = replace_text(paragraph, old, new)
-            if verbose or dryrun:  # Print out result
-                for text in text_it:
+            for text in text_it:
+                if verbose or dryrun:  # Print out result
                     colored = text.replace(new, CRED + new + CEND)
                     print(colored)
 
