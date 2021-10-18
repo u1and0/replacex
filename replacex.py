@@ -14,7 +14,7 @@ CEND = '\033[0m'
 
 
 def replace_text(paragraph, before, after):
-    """paragraph内の文字列beforeをafterへ置換する"""
+    """replace before -> after in paragraph"""
     replaced_text = paragraph.text.replace(before, after)
     if paragraph.text != replaced_text:
         paragraph.text = replaced_text
@@ -24,24 +24,29 @@ def replace_text(paragraph, before, after):
         yield paragraph.text
 
 
-def main(old, new, *filenames, dryrun=False, verbose=False):
-    """execute replace_text to multiple files"""
+def replace_document(old, new, document):
+    """execute replaced_text to multiple paragraphs"""
+    # Rewrite sentence
+    sentence_paragraphs = (paragraph for paragraph in document.paragraphs)
+    # Rewrite table
+    table_paragraphs = (paragraph for table in document.tables
+                        for row in table.rows for cell in row.cells
+                        for paragraph in cell.paragraphs)
+    # Concat iter
+    paragraphs = chain(sentence_paragraphs, table_paragraphs)
+    # Edit contents
+    return (replace_text(paragraph, old, new) for paragraph in paragraphs)
+
+
+def main(old, new, *filenames, dryrun, verbose):
+    """execute replace_document to multiple files"""
     for filename in filenames:
         document = Document(filename)
         if verbose or dryrun:
             print("==filename:", filename, "==")
-        # Rewrite sentence
-        sentence_paragraphs = (paragraph for paragraph in document.paragraphs)
-        # Rewrite table
-        table_paragraphs = (paragraph for table in document.tables
-                            for row in table.rows for cell in row.cells
-                            for paragraph in cell.paragraphs)
-        # Concat iter
-        paragraphs = chain(sentence_paragraphs, table_paragraphs)
-        # Edit contents
+        paragraphs = replace_document(old, new, document)
         for paragraph in paragraphs:
-            text_it = replace_text(paragraph, old, new)
-            for text in text_it:
+            for text in paragraph:
                 # Print out result to stdout if verbose mode or dryrun mode
                 if verbose or dryrun:
                     colored = text.replace(new, CRED + new + CEND)
