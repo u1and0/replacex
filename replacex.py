@@ -3,11 +3,12 @@
 """
 import sys
 import argparse
+from itertools import chain
 from docx import Document
 # from docx.shared import Pt
 from docx.shared import RGBColor
 
-VERSION = 'v1.0.0'
+VERSION = 'v1.0.1'
 CRED = '\033[91m'
 CEND = '\033[0m'
 
@@ -30,19 +31,22 @@ def main(old, new, *filenames, dryrun=False, verbose=False):
         if verbose or dryrun:
             print("==filename:", filename, "==")
         # Rewrite sentence
-        for paragraph in document.paragraphs:
+        sentence_paragraphs = (paragraph for paragraph in document.paragraphs)
+        # Rewrite table
+        table_paragraphs = (paragraph for table in document.tables
+                            for row in table.rows for cell in row.cells
+                            for paragraph in cell.paragraphs)
+        # Concat iter
+        paragraphs = chain(sentence_paragraphs, table_paragraphs)
+        # Edit contents
+        for paragraph in paragraphs:
             text_it = replace_text(paragraph, old, new)
             for text in text_it:
-                if verbose or dryrun:  # Print out result
+                # Print out result to stdout if verbose mode or dryrun mode
+                if verbose or dryrun:
                     colored = text.replace(new, CRED + new + CEND)
                     print(colored)
-
-        # Rewrite table
-        paragraphs = (paragraph for table in document.tables
-                      for row in table.rows for cell in row.cells
-                      for paragraph in cell.paragraphs)
-        for paragraph in paragraphs:
-            replace_text(paragraph, old, new)
+        # Save Document unless dryrun mode
         if not dryrun:
             document.save(filename)
 
