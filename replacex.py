@@ -9,7 +9,7 @@ from docx import Document
 # from docx.shared import Pt
 from docx.shared import RGBColor
 
-VERSION = 'v1.0.1'
+VERSION = 'v1.0.2'
 CRED = '\033[91m'
 CEND = '\033[0m'
 
@@ -84,10 +84,13 @@ def parse():
 
 
 if __name__ == '__main__':
-    argv = parse()
-    if argv.version:
+    # perse()内だとPositional Argument として
+    # old, newを要求するからversion表示がされないので、
+    # ここであえてversion表示スクリプトをparse()前に走らせる
+    if '-V' in sys.argv or '--version' in sys.argv:
         print('replacex:', VERSION)
         sys.exit(0)
+    argv = parse()
     main(argv.old,
          argv.new,
          *argv.files,
