@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 """Replace text and highlight it in docx files.
+
+# require: python-docx
+
+$ pip install docx
 """
 import sys
 import argparse
