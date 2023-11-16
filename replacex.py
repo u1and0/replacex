@@ -3,14 +3,13 @@
 
 # require: python-docx
 
-$ pip install docx
+$ pip install python-docx
 """
 import sys
 import argparse
 from itertools import chain
 from more_itertools import collapse
 from docx import Document
-# from docx.shared import Pt
 from docx.shared import RGBColor
 
 VERSION = 'v1.0.2'
@@ -23,8 +22,6 @@ def replace_text(paragraph, before, after):
     replaced_text = paragraph.text.replace(before, after)
     if paragraph.text != replaced_text:
         paragraph.text = replaced_text
-        # Modify docx sentence
-        # paragraph.runs[0].font.size = Pt(10.5)
         paragraph.runs[0].font.color.rgb = RGBColor(235, 0, 0)
         yield paragraph.text
 
