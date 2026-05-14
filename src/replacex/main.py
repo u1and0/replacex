@@ -14,8 +14,6 @@ from docx import Document
 from docx.shared import RGBColor
 
 VERSION = "v1.0.2"
-CRED = "\033[91m"
-CEND = "\033[0m"
 
 
 def replace_text(paragraph, before, after):
@@ -45,6 +43,13 @@ def replace_document(old, new, document):
     return (replace_text(paragraph, old, new) for paragraph in paragraphs)
 
 
+def colored_text(paragraph: str, text: str) -> str:
+    """replace red color terminal displaiable text"""
+    cred = "\033[91m"
+    cend = "\033[0m"
+    return paragraph.replace(text, cred + text + cend)
+
+
 def run(old, new, *filenames, dryrun, verbose):
     """execute replace_document to multiple files"""
     for filename in filenames:
@@ -58,8 +63,7 @@ def run(old, new, *filenames, dryrun, verbose):
         for paragraph_text in collapse(paragraphs):  # Replace text HERE
             # Print out result to stdout if verbose mode or dryrun mode
             if verbose or dryrun:
-                colored = paragraph_text.replace(new, CRED + new + CEND)
-                print(colored)
+                print(colored_text(paragraph_text, new))
         # Save Document unless dryrun mode
         if not dryrun:
             document.save(filename)
