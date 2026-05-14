@@ -13,7 +13,7 @@ from more_itertools import collapse
 from docx import Document
 from docx.shared import RGBColor
 
-VERSION = "v1.0.2"
+VERSION = "v1.0.3"
 
 
 def replace_text(paragraph, before, after):
@@ -57,15 +57,17 @@ def run(old, new, *filenames, dryrun, verbose):
         if verbose or dryrun:
             print("==filename:", filename, "==")
         paragraphs = replace_document(old, new, document)
+        is_changed = False
         # Break nested iters by collapse()
         # replace_document() , replace_text() are generator
         # execute to edit docx through this 'for' statement
         for paragraph_text in collapse(paragraphs):  # Replace text HERE
+            is_changed = True
             # Print out result to stdout if verbose mode or dryrun mode
             if verbose or dryrun:
                 print(colored_text(paragraph_text, new))
-        # Save Document unless dryrun mode
-        if not dryrun:
+        # Save Document unless dryrun mode and only if changes exist
+        if not dryrun and is_changed:
             document.save(filename)
 
 
