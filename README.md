@@ -17,3 +17,10 @@ optional arguments:
   -v, --verbose  print replacement result to stdout
   -V, --version
 ```
+
+
+## Install
+`uv tool install .`
+
+## Install dev
+`uv tool install --editable .`
