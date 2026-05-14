@@ -1,0 +1,12 @@
+[project]
+name = "replacex"
+version = "0.1.0"
+description = "Docx replacement tool"
+dependencies = [
+    # requirements.txt の内容をここに記述
+    "more-itertools",
+    "python-docx", 
+]
+
+[project.scripts]
+replacex = "replacex.main:main"
