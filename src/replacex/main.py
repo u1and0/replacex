@@ -13,7 +13,7 @@ from more_itertools import collapse
 from docx import Document
 from docx.shared import RGBColor
 
-VERSION = "v1.0.2"
+VERSION = "v1.0.3"
 
 
 def replace_text(paragraph, before, after):
